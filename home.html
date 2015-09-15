@@ -1,0 +1,580 @@
+<!DOCTYPE html> 
+<html>
+<head>
+   <meta charset="utf-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+     <title>Home</title>
+		<script src="js/jquery-1.10.2.min.js"></script>
+		<script src="js/jquery.mobile-1.4.3.min.js"></script>
+		<script src="js/responsiveslides.min.js"></script>
+		<script charset="utf-8" src="js/apiomat.js"></script>
+		<script src="js/textEffect.jquery.js"></script>
+		<script src="js/jquery.blockUI.js"></script>
+		<script src="js/jquery.cycle.all.js"></script>
+		<script src="js/jquery.easing.1.3.js"></script>		
+		<link rel="stylesheet" type="text/css" href="css/jquery.mobile-1.4.3.min.css"> 
+		<link media="screen" rel="stylesheet" type="text/css" href="css/style.css">
+		<link rel="stylesheet" href="css/cipa1.min.css"/> 	
+		<link rel="stylesheet" href="css/jqm-demos.css">
+		<link rel="stylesheet" href="css/demo.css">
+	  	 	 
+  <!-- Pengecekan Aplikasi dengan Device -->
+  <script type="text/javascript" charset="utf-8" src="js/cordova.js"></script>
+        <script type="text/javascript" charset="utf-8">
+	// Wait for Cordova to load
+	function init() {
+        document.addEventListener("deviceready", onDeviceReady, false);
+    }
+	// Cordova is ready
+    function onDeviceReady() {
+		console.log("Aplikasi Siap...");
+		document.addEventListener("backbutton", doClose, false);
+		checkConnection();
+	}	
+	// Notiv Keluar
+	function doClose() {
+		navigator.notification.confirm(
+			'Keluar dari Aplikasi ?',
+			exitApp,
+			'Info Bunga-Bunga di Kabupaten Cianjur',
+			'Cancel,Ok'
+		);
+	}
+	function exitApp(buttonIndex) {
+			if (buttonIndex == 2) {
+			navigator.app.exitApp();
+			}
+		else {
+			window.close();
+		}
+	}
+	
+	    function checkConnection() {
+            var _check=true;
+			var networkState = navigator.connection.type;
+            var states = {};
+            states[Connection.UNKNOWN]  = 'Unknown connection';
+            states[Connection.ETHERNET] = 'Ethernet connection';
+            states[Connection.WIFI]     = 'WiFi connection';
+            states[Connection.CELL_2G]  = 'Cell 2G connection';
+            states[Connection.CELL_3G]  = 'Cell 3G connection';
+            states[Connection.CELL_4G]  = 'Cell 4G connection';
+            states[Connection.CELL]     = 'Cell generic connection';
+            states[Connection.NONE]     = 'No network connection';
+
+        //alert('Connection type: '+ networkState + states[networkState]);
+        if(networkState==='unknown'){
+            _check=false;
+            showAlert();
+            return _check;
+        }
+        else {
+            return true;
+			}
+		}
+    function showAlert() {
+        navigator.notification.alert("Coba Lagi Nanti..",onDeviceReady,"Perangkat tidak terkoneksi internet","OK");
+    }
+	
+	//Fungsi Menunggu;
+	function wait() {
+	$(document).ready(function() { 
+        $.blockUI({ css: { 
+            border: 'none', 
+            padding: '15px', 
+            backgroundColor: '#000', 
+            '-webkit-border-radius': '10px', 
+            '-moz-border-radius': '10px', 
+            opacity: .5, 
+            color: '#fff' 
+        } }); 
+         setTimeout($.unblockUI, 2000); 
+    });   
+	}
+	
+</script>
+</head> 
+<body onload="init();signup();wait();">
+<p id="name" style="display:none"></p>	
+<div data-role="page" id="home" data-theme="a"  class="jqm-demos jqm-home" >
+<!-- Header -->												
+	<div data-role="header" class="jqm-header">
+	<a href="#nav-panel" data-icon="grid"  data-ajax="false" data-iconpos="notext"></a>
+	<a href="#" onClick="window.location.reload()" data-icon="refresh" data-ajax="false" data-iconpos="notext"></a><div>
+	<h2 style="white-space: normal;" aria-level="1" role="heading" class="ui-title"><img src="image/iconbunga.png"></h2>
+	<h2 style="white-space: normal;font-weight:bold;font-style:italic;color:#000;" aria-level="1" role="heading" class="ui-title" id="texthead">
+	INFO SPESIES BUNGA</h2>	</div></div>
+	<div role="main" data-theme="b"  class="ui-content jqm-content" align="center" style="background-image:url('image/'); background-attachment: fixed; background-repeat: repeat;"  >
+
+<!-- Slider -->
+	<div class="slide" id="tes"></div>
+	
+<!-- ListView BUNGA UTAMA-->
+<p style="display:none" >Clicks:  <a id="clicks" >1</a></p>
+<ul id="listbunga" data-role="listview" data-filter="true" data-filter-placeholder="Cari Bunga..." ></ul>
+<div class="ui-body-d ui-content">
+<img src="image/loading2.gif" width="60px" height="60px" id="loading_gmb"></div>
+<a href="#" data-ajax="false" onclick=" clearTable();clickME();" id="showMore" class="ui-btn  ui-mini ui-corner-all ui-btn-icon-left ui-icon-plus" 
+style="display:none" >Show more</a>
+<!-- footer -->
+	<div data-theme="a" data-role="footer" data-position="fixed" data-tap-toggle="false" class="jqm-footer">
+		<p>Info Bunga-Bunga di Kabupaten Cianjur <span class="jqm-version"></span></p>
+		<p>Copyright 2015 Cipa Development </p2>
+	</div>
+</div>
+
+
+ <!-- Panel -->
+<div data-role="panel" data-position-fixed="true" data-display="overlay" id="nav-panel">
+		<ul data-role="listview" data-inset="true">
+        <li>  <a id="formbunga" href="" onClick="clearAll();"data-ajax="false" class="ui-btn  ui-mini ui-corner-all ui-btn-icon-left ui-icon-search" data-transition="slidedown">Cari Spesies Bunga</a>
+		</li>
+		<li><a href="#taman" data-ajax="false" class="ui-btn  ui-mini ui-corner-all ui-btn-icon-left ui-icon-info" data-transition="slide">Taman Bunga</a>
+        </li>
+		<li><a href="#bantuan" data-ajax="false" class="ui-btn  ui-mini ui-corner-all ui-btn-icon-left ui-icon-alert" data-transition="slide">Bantuan</a>
+        </li>
+        <li><a href="#tentang" data-ajax="false" class="ui-btn  ui-mini ui-corner-all ui-btn-icon-left ui-icon-info" data-transition="slidefade">Tentang</a>
+        </li>
+		<li><a href="#" data-ajax="false" onclick="doClose()" data-role="button" class="ui-btn  ui-mini ui-corner-all ui-btn-icon-left ui-icon-delete">Keluar</a></li>
+		<div data-theme="a" data-role="footer" data-position="fixed" data-tap-toggle="false" class="jqm-footer">
+		<p>Copyright 2015 Cipa Development </p>
+		</div>
+	</div>
+</div>
+
+
+<!--MENU Taman Bunga-->
+	<div  id="taman" data-role="page" id="page" data-theme="b"  class="jqm-demos jqm-home"  >																																						
+<!-- /header -->
+	<div data-role="header" class="jqm-header">	<div>
+	<h2 style="white-space: normal;" aria-level="1" role="heading" class="ui-title"><img src="image/info.png"  ></h2>
+	<h2 style="white-space: normal;font-weight:bold;" aria-level="1" role="heading" class="ui-title" >TAMAN BUNGA</h2>
+	</div><a href="#home" data-icon="home" data-ajax="false" data-iconpos="notext"></a>
+    </div>
+ 	<div role="main" data-theme="a"  class="ui-content jqm-content" align="center" style="background-image:url('image/background.jpg'); background-attachment: fixed; background-repeat: repeat;"  >
+	<div id="detail" class="ui-body-d ui-content" style="font-weight: bold";>
+    <h2 style="text-align:justify;color:yellow;font-style:italic;font-size:14px;">
+	
+	<div data-role="collapsible">
+    <h2>TAMAN BUNGA NUSANTARA</h2>
+    <p><b>TAMAN BUNGA NUSANTARA (TBN)</b><br>
+	<img src="image/tbn.jpg" style="max-width:100%;height:auto;"></p>
+    <p><b>SEJARAH</b><br>
+	Taman Bunga Nusantara merupakan taman display bunga pertama di Indonesia. Taman ini dilengkapi dengan berbagai koleksi tanaman berbunga yang terkenal dan unik dari seluruh dunia. Dengan beratus varietas tanaman berbunga di taman, Taman Bunga Nusantara benar - benar menjadi tempat dimana bunga - bunga dari seluruh dunia tumbuh. Kami menampilkan areal yang sangat luas bagi pertumbuhan bunga - bunga dari Amerika Selatan,  Australia,  Afrika serta Asia. Kami memiliki lahan display bedding plant seluas 50.000 m2.<br><br>
+
+	Ibu Dani Bustanil Arifin , pemakarsa sekaligus Ketua Umum Yayasan Bunga Nusantara, beserta anggota lainnya mulai merintis pembangunan taman ini pada tahun 1992, dan secara intensif pelaksanaan pembangunan tahap awal taman dimulai sejak tahun 1993. Tujuan utama pembangunan taman ini bagi Yayasan Bunga Nusantara adalah menciptakan Taman Bunga Nusantara sebagai salah satu aset wisata  berbasis wisata agro nasional dengan skala internasional. Selain itu, tujuan lain diciptakannya Taman Bunga Nusantara adalah:<br>
+	1. Membantu Pemerintah di bidang pembangunan agrowisata.<br>
+	2. Menyediakan fasilitas dan sarana untuk penelitian, pendidikan, dan meningkatkan  kreatifitas masyarakat.<br>
+	3. Membantu meningkatkan pertumbuhan sektor ekonomi, pendapatan daerah dan masyarakat khususnya petani bunga.<br>
+	4. Melestarikan tanaman langka dan wawasan lingkungan hidup.<br>
+	5. Lapangan kerja masyarakat sekitar.<br>
+	6. Meningkatkan cinta masyarakat akan bunga sebagai sumber pendapatan dan kesejahteraan.<br>
+	7. Menyediakan tempat rekreasi yang sehat bagi wisatawan domestik dan mancanegara.<br>
+	8. Mencari sumber pertumbuhan baru di sektor pertanian.<br><br>
+	<b>ALAMAT</b><br>
+	Jalan Mariwati KM 7 Desa Kawungluwuk Kecamatan Sukaresmi - Cianjur, Jawa Barat <br><br>
+	
+	<b>JAM OPERASIONAL</b><br>
+	Senin - Jumat 08.00 - 17.00 WIB <br>
+	Sabtu, Minggu, dan Libur Nasional 08.00 - 17.30 WIB <br><br>
+	
+	<b>HARGA TIKET MASUK (HTM)</b><br>
+	Per Orang : Rp. 30.000,-<br>
+	Parkir Motor : Rp. 5000,-<br>
+	Parkir Mobil : Rp. 10.000,-<br>
+	Parkir Minubus : Rp. 15.000,-<br>
+	Parkir Bus : Rp. 20.000,- <br><br>
+	
+	<b>KONTAK</b><br>
+	No. Telp: <br>
+	+62 263 581 617<br>
+	+62 263 581 618<br>
+	email: tamanbunganusantara@yahoo.co.id. <br><br>
+	
+	<b>WEBSITE</b><br>
+	<a href="www.krcibodas.lipi.go.id">www.tamanbunga-nusantara.com. </a></br>	
+	</p>
+	</div>
+	
+	<div data-role="collapsible">
+    <h2 style="text-align:justify">KEBUN RAYA CIBODAS</h2>
+	<p><b>KEBUN RAYA CIBODAS</b><br>
+	<img src="image/krc.png" style="max-width:100%;height:auto;"></p>
+    <p><b>SEJARAH</b><br>
+	Didirikan pada tanggal 11 April 1852 oleh Johannes Ellias Teijsmann, seorang kurator Kebun Raya Bogor pada waktu itu, dengan nama Bergtuin te Tjibodas (Kebun Pegunungan Cibodas). Pada awalnya dimaksudkan sebagai tempat aklimatisasi jenis-jenis tumbuhan asal luar negeri yang mempunyai nilai penting dan ekonomi yang tinggi, salah satunya adalah Pohon Kina (Cinchona calisaya). Kemudian berkembang menjadi bagian dari Kebun Raya Bogor dengan nama Cabang Balai Kebun Raya Cibodas. Mulai tahun 2003 status Kebun Raya Cibodas menjadi lebih mandiri sebagai Unit Pelaksana Teknis Balai Konservasi Tumbuhan Kebun Raya Cibodas di bawah Pusat Konservasi Tumbuhan Kebun Raya Bogor dalam kedeputian Ilmu Pengetahuan Hayati Lembaga Ilmu Pengetahuan Indonesia (LIPI).<br><br>
+
+	Lokasi Kebun Raya Cibodas – LIPI berada di kaki Gunung Gede dan Gunung Pangrango pada ketinggian kurang lebih 1.300 – 1.425 meter di atas permukaan laut dengan luas 84,99 hektar. Temperatur rata-rata 20,06 °C, kelembaban 80,82 % dan rata-rata curah hujan 2.950 mm per tahun. Kebun Raya Cibodas merupakan tempat yang nyaman untuk beristirahat sambil menikmati keindahan berbagai jenis tumbuhan yang berasal dari Indonesia dan negara-negara lain. Kebun Raya Cibodas berjarak ±100 KM dari Jakarta dan ± 80 KM dari Bandung.<br><br>
+	<b>ALAMAT</b><br>
+	Jl. Kebun Raya Cibodas, Cipanas, Sindanglaya, Kec. Cianjur, Jawa Barat 43253.<br><br>
+	
+	<b>JAM OPERASIONAL</b><br>
+	Senin – Minggu Pukul 08.00 WIB  sampai pukul 17.00 WIB.<br><br>
+	
+	<b>HARGA TIKET MASUK (HTM)</b><br>
+	Rp. 9.500,- per orang, Tiket kendaraan roda dua Rp 5.000,- per motor dan tiket kendaraan roda empat Rp 16.000,-.<br><br>
+	
+	<b>KONTAK</b><br>
+	No. Telp: (0263) 512233<br>
+	email: jasin.krcibodas@mail.lipi.go.id. <br><br>
+	
+	<b>WEBSITE</b><br>
+	<a href="www.krcibodas.lipi.go.id">www.krcibodas.lipi.go.id. </a><br>	
+	</p>
+	</div>
+		<br><br><b>By: Cipa Development</b></h2>
+		</div>
+    </div>
+	</div>
+
+
+<!--MENU bantuan-->
+	<div  id="bantuan" data-role="page" id="page" data-theme="a"  class="jqm-demos jqm-home"  >																																						
+<!-- /header -->
+	<div data-role="header" class="jqm-header">	<div>
+	<h2 style="white-space: normal;" aria-level="1" role="heading" class="ui-title"><img src="image/help.png"  ></h2>
+	<h2 style="white-space: normal;font-weight:bold;font-style:italic;" aria-level="1" role="heading" class="ui-title">BANTUAN</h2>
+	</div>
+    <a href="#home" data-icon="home" data-ajax="false" data-iconpos="notext"></a></div>
+	<div role="main" data-theme="b"  class="ui-content jqm-content" align="center" style="background-image:url('image/'); background-attachment: fixed; background-repeat: repeat;"  >
+	
+	
+	<div id="detail" class="ui-body-d ui-content" style="font-weight: bold";>
+	<h2 style="text-align:justify;color:black;font-style:italic;font-size:14px;"><li>
+	<b style="color:black;font-size:16px;">1. Halaman Home : </b> Terdapat 2 panel, panel kiri atas berisi menu-menu cari bunga, taman, bantuan, tentang, dan keluar. panel kanan atas merupakan tombol refresh.<br>
+	terdapat form cari bunga dan list menu nama-nama bunga.</li><br><br><li>
+	<b style="color:black;font-size:16px;">2. Halaman Bunga :</b> Terdapat 3 navbar, yaitu informasi, lokasi dan tips perawatan. </li><br><br><li>
+	<b style="color:black;font-size:16px;">3. Panel Menu : </b> Berisi menu cari bunga, informasi taman, bantuan, tentang dan pilihan keluar dari aplikasi.</li>
+	</div>
+    </div>
+<!-- /footer -->
+	<div data-theme="a" data-role="footer" data-position="fixed" data-tap-toggle="false" class="jqm-footer">
+		<p>Info Bunga-Bunga di Kabupaten Cianjur <span class="jqm-version"></span></p>
+		<p>Copyright 2015 Cipa Development </p2>
+	</div>
+	</div>
+ 
+ 
+<!--MENU tentang-->
+	<div  id="tentang" data-role="page" id="page" data-theme="a"  class="jqm-demos jqm-home"  >																																						
+<!-- /header -->
+	<div data-role="header" class="jqm-header">	<div>
+	<h2 style="white-space: normal;" aria-level="1" role="heading" class="ui-title"><img src="image/info.png"  ></h2>
+	<h2 style="white-space: normal;font-weight:bold;" aria-level="1" role="heading" class="ui-title" >TENTANG</h2>
+	</div><a href="#home" data-icon="home" data-ajax="false" data-iconpos="notext"></a>
+    </div>
+ 	<div role="main" data-theme="a"  class="ui-content jqm-content" align="center" style="background-image:url('image/background.jpg'); background-attachment: fixed; background-repeat: repeat;"  >
+	<div id="detail" class="ui-body-d ui-content" style="font-weight: bold";>
+        <h2 style="text-align:justify;color:black;font-style:italic;font-size:14px;"><li>
+		<b style="color:black;font-size:16px;">Deskripsi:</b>
+		Aplikasi Sistem Informasi Jenis - Jenis Bunga di Taman Bunga di Kabupaten Cianjur ini berisi informsai mengenai jenis bunga yang ada di Taman di Kabupaten Cianjur, tepatnya di Taman Bunga Nusantara dan Kebun Raya Cibodas beserta informasi mengenai bunga tersebut dan tips perawatannya.</li><br><li> 
+		<b style="color:black;font-size:16px;">Fitur:</b> Terdapat informasi mengenai nama bunga yang dipakai di Indonesia, asal negara, karakteristik, usia hidup, periode tumbuh, letak bunga, tips perawatan dan informasi mengenai taman bunga yang bersangkutan.</li><br>
+		<b style="color:black;font-size:14px;">Kritik, Saran Aplikasi.</b><br>
+		<a href="mailto:cipa_nurani@yahoo.co.id"><img src="image/email.png" align="left" width="45px" height="45px" /><br><b style="color:black;font-size:14px;"><u>email: cipa_nurani@yahoo.co.id</u></b></a>
+		<br><br><b>By: Cipa Development</b></li></h2>
+		</div>
+    </div>
+ 
+ <!-- /footer -->
+	<div data-theme="a" data-role="footer" data-position="fixed" data-tap-toggle="false" class="jqm-footer">
+		<p>Info Bunga-Bunga di Kabupaten Cianjur <span class="jqm-version"></span></p>
+		<p>Copyright 2015 Cipa Development </p2>
+	</div>
+	</div>
+	
+	
+<!--////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////-->	
+	
+	<!-- MENU FORM BUNGA -->
+<div  data-role="page" id="formbunga" data-theme="a"  class="jqm-demos jqm-home"  >													
+	<div data-role="header" class="jqm-header"   >
+	<div>
+	<h2 style="white-space: normal;" aria-level="1" role="heading" class="ui-title"><img src="image/iconbunga.png"  ></h2>
+	<h2 style="white-space: normal;font-weight:bold;" aria-level="1" role="heading" class="ui-title">CARI SPESIES BUNGA</h2>	
+	</div><a href="#home" data-icon="home" data-ajax="false" data-iconpos="notext"></a>
+	</div>
+	<div role="main" data-theme="b"  class="ui-content jqm-content" align="center" style="background-image:url('image/'); background-attachment: fixed; background-repeat: repeat;"  >
+ 
+ <!--Slider-->
+	<div class="slide" id="tes2"> </div>
+	
+<!-- Page Form Bunga -->
+	<div data-role="main" class="ui-form" >			
+		<div class="ui-field-contain">
+		<label for="select-choice-a" class="select">ASAL NEGARA</label>
+		<select name="select-choice-a" id="asneg" data-native-menu="false" width="80px">
+			<option>ASAL NEGARA</option>
+            <option value="">AFRIKA</option>			
+            <option value="">BRAZIL</option>
+            <option value="">CHINA</option>			
+            <option value="">INDIA</option>
+            <option value="">JEPANG</option>
+			<option value="">MEXICO</option>
+			<option value="">VIETNAM</option>			
+        </select>
+		</div>
+      <input onClick="clearForm()" id="cari" type="submit" data-inline="true" value="CARI">
+	  <hr></hr>
+	  <p id="hasil" style="text-align:justify;color:yellow;font-weight:bold;font-style:italic;font-size:16px;"></p>
+		<p id="cariasneg" style="display:none"></p>
+      <ul id="autocomplete" data-role="listview"></ul>
+  	</div>
+	<!-- /footer -->
+	<div data-theme="a" data-role="footer" data-position="fixed" data-tap-toggle="false" class="jqm-footer">
+		<p>Info Bunga-Bunga di Kabupaten Cianjur <span class="jqm-version"></span></p>
+		<p>Copyright 2015 Cipa Development </p2>
+	</div>
+	</div>
+</div>
+  
+
+<!-- BAGIAN DATABASE
+Catatan:
+1. Untuk nama table, huruf awal harus Besar
+2. Untuk pemanggilan field lebih dari satu, beri imbuhan "s"
+3. Perhatikan penulisan table dan field secara teliti
+-->   
+<script>
+<!--Fungsi sinkronisasi ke data awan-->
+
+  function signup()
+  {
+    var user = new Apiomat.User();
+    user.setUserName("_username_");
+    user.setPassword("_password_");
+    Apiomat.Datastore.configure(user);
+	
+    var saveCB = {
+      onOk: function() {
+        statusField.innerHTML = "Saved user successfully";
+        
+      },
+      onError: function(error) {
+	   showAlert();
+        statusField.innerHTML = "Some error occured. "+ error.statusCode + " --> " + error.message;
+      }
+    };
+    user.loadMe({
+      onOk: function() {
+		    loadPages();	
+		    loadPages2();	
+      },
+      onError: function(error) {
+        user.save(saveCB);
+      }
+    });
+  }
+ 
+<!--Menampilkan/query data dari Class/table Bunga-->
+ 
+	function loadPages()
+  {
+    Apiomat.Bunga.getBungas(undefined, 
+    {
+    onOk:function(bases) 
+	{
+    var clicks = bases.length - count ;
+        if ( clicks < 0) { 
+      	 for (var i=0; i < bases.length;i++) {
+          addToPageBunga(bases[i]);       
+        }
+      }
+      else {    
+      	for (var i=clicks; i < bases.length;i++) {
+          addToPageBunga(bases[i]);    
+        }
+      }
+	},
+  onError: function(error) {
+    status.innerHTML = "Can't load list: "+ error.statusCode + " --> " + error.message;
+	showAlert();
+		}
+	});
+  }
+
+  <!--Melakukan Query data List Bunga-->
+ function addToPageBunga(base)
+  {
+		var tes = document.getElementById("tes");
+		var img= document.createElement("img");img.src = base.getIconURL();
+		img.style.background="url('image/noimage.png') center no-repeat ";
+		tes.appendChild(img);
+		$('#tes').cycle({ 
+		fx:      'scrollLeft', 
+		timeout:  3000, 
+		easing:  'easeInOutBack'
+		});
+	var sM = document.getElementById("showMore");
+	sM.style.display=(sM.style.display!='none')?'visible':'';  
+	
+	var ldg = document.getElementById("loading_gmb");
+	ldg.style.display='none';  
+	
+	var listbunga = document.getElementById("listbunga");
+    var option2 = document.createElement("li");
+    option2.style.textAlign = 'center'; 
+    option2.className = "ui-first-child ui-last-child ui-li-has-thumb "; 
+    listbunga.appendChild(option2);  
+    var result = document.createElement("a");
+    result.className = "ui-btn ui-btn-icon-right ui-icon-carat-r";
+    result.style.color = "#fff";
+    result.style.textAlign = 'left'  
+    option2.appendChild(result); 
+    result.innerHTML = base.getNm_bunga();
+    result.value = base.getKd_bunga();
+    var img2 = document.createElement("img");img2.src = base.getIconURL();
+	img2.className = "imgcenter";
+	var p1 = document.createElement("p");
+    p1.innerHTML = "<b>Lokasi Taman Bunga : </b>"+base.getLokasi();
+    result.appendChild(img2);
+    result.appendChild(p1);
+	result.onclick = 	function () {
+    window.location.href ="bunga.html?id="+  result.value ;
+	}   
+}
+
+<!--Menampilkan/query data dari Class/table Detail-->
+  function loadPages2()
+  {
+      Apiomat.Detail.getDetails(undefined, 
+     {
+     
+     onOk:function(dtbungas) 
+     { for (var i=0; i < dtbungas.length;i++) 
+     { addToPageDtbunga(dtbungas[i]);}
+  },
+  onError: function(error) {
+    status.innerHTML = "Can't load list: "+ error.statusCode + " --> " + error.message;
+	showAlert();
+  }
+  });
+  }
+
+  <!--Melakukan Query data-->
+  function addToPageDtbunga(dtbunga)
+  {
+		var tes2 = document.getElementById("tes2");
+		var img= document.createElement("img");img.src = dtbunga.getGmb1URL();
+		img.style.background="url('image/noimage.png') center no-repeat ";
+		tes2.appendChild(img);
+		$('#tes2').cycle({ 
+		fx:    'scrollDown', 
+		delay: -2000
+		});
+	  	   
+      var formbunga = document.getElementById("formbunga");
+	  formbunga.value = dtbunga.getKd_detail();
+	  formbunga.onclick = function () {
+      window.location.href ="home.html#formbunga?id=" + formbunga.value;
+	  }  
+	  }   
+	  
+<!--Menampilkan/query data sesuai kriteria -->	 
+ 
+	function loadSearch()
+  {   
+     var a =  document.getElementById("cariasneg").innerHTML ;
+     var yf = "asal_negara like"+'"'+a+'"';
+     Apiomat.Detail.getDetails( yf, 
+     {
+     onOk:function(searchs)
+     {
+      for (var i=0; i < searchs.length;i++) 
+     { addToSearch(searchs[i]);
+     }
+  },
+  onError: function() {
+    status.innerHTML = "Can't load list: ";
+	showAlert();
+  }
+  });
+  }
+    
+   function addToSearch(search)
+  {
+		var hasil = document.getElementById("hasil");
+		hasil.innerHTML = "HASIL";
+			$(function() {
+			blink('#hasil');
+			})
+			function blink(selector) {
+			$(selector).fadeOut('medium', function() {
+			$(this).fadeIn('medium', function() {
+			blink(this);
+			});	});
+		}		
+		var list2 = document.getElementById("autocomplete");
+		var option2 = document.createElement("li");
+		option2.style.textAlign = 'center'; 
+		option2.className = "ui-first-child ui-last-child ui-li-has-thumb "; 
+		list2.appendChild(option2);      
+		var result = document.createElement("a");
+		result.className = "ui-btn ui-btn-icon-right ui-icon-carat-r";
+		result.style.color = "#fff";
+		result.style.textAlign = 'left'  
+		result.style =  "white-space: normal;";
+		option2.appendChild(result); 
+		result.innerHTML = search.getNm_bunga_det() +" - Asal Negara: "+ search.getAsal_negara();
+		result.value = search.getKd_detail();
+		var img = document.createElement("img");img.src = search.getGmb1URL();
+		img.className = "imgcenter";
+		var p1 = document.createElement("p");
+		p1.innerHTML = "Karakteristik: "+ search.getKarakter();
+		result.appendChild(img);
+		result.appendChild(p1);
+		result.onclick = 	function () {
+		window.location.href ="bunga.html#detail?id="+  result.value ;
+	    }
+	  }
+
+function cari() {
+	var cari = $( "#asneg option:selected" ).text();
+	var test1 = document.getElementById("cariasneg").innerHTML= cari;
+	loadSearch();
+}
+	
+ <!--Showmore-->
+	 
+		var count = 6;
+         function clickME() {
+          count +=3;
+           document.getElementById("clicks").innerHTML = count;
+           var sM = document.getElementById("showMore");
+           sM.style.display=(sM.style.display!='none')?'none':'';	
+		   wait();
+           loadPages();
+		   }
+            
+          function clearTable()
+          {
+          var table = document.getElementById("listbunga");
+          table.innerHTML = '';
+          }
+          
+		  function clearForm()
+          {
+          var table1 = document.getElementById("autocomplete");
+          table1.innerHTML = '';
+		  cari();
+          }
+		  
+		  function clearAll()
+          {
+          var table2 = document.getElementById("autocomplete");
+          table2.innerHTML = '';
+          }
+	 
+	
+	  <!--Text Effect-->
+	jQuery(document).ready(function($) {
+	$('#texthead').textEffect({
+		effect: 'dropdown', // the type of the text aniamtion. fade, glow, jumble, slide, dropdown and random (default)
+		effectSpeed: 200, // the speed in ms at which new letters begin to animate.
+		completionSpeed: 10000, // the speed in ms of the text aniamtion.
+		jumbleColor: '#0000FF' // the color of the jumbled letters.
+	});
+	});
+	
+</script>
+</body>
+</html>

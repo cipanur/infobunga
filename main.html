@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>Splash Screen BUNGA-BUNGA</title>
+    <script type='text/javascript' src='js/jquery-1.10.2.min.js'></script>
+	<script src="js/textEffect.jquery.js"></script>
+  <link media="screen" rel="stylesheet" type="text/css" href="css/styleSplash.css">
+<script type='text/javascript'>
+
+//<![CDATA[ 
+$(window).load(function(){
+$(document).ready(function () {
+    window.setInterval(function () {
+        var iTimeRemaining = $("#spnSeconds").html();
+        iTimeRemaining = eval(iTimeRemaining);
+        if (iTimeRemaining == 0) {
+            location.href = "home.html";
+        } else {
+            $("#spnSeconds").html(iTimeRemaining - 1);
+        }
+    }, 1000);
+});
+});//]]>  
+
+jQuery(document).ready(function($) {
+$('#texthead').textEffect({
+effect: 'slide', // the type of the text aniamtion. fade, glow, jumble, slide, dropdown and random (default)
+effectSpeed: 200, // the speed in ms at which new letters begin to animate.
+completionSpeed: 7000, // the speed in ms of the text aniamtion.
+jumbleColor: '#0000FF' // the color of the jumbled letters.
+});
+next();});
+
+function next(){
+jQuery(document).ready(function($) {
+$('#textheadback').textEffect({
+effect: 'slideback', // the type of the text aniamtion. fade, glow, jumble, slide, dropdown and random (default)
+effectSpeed: 200, // the speed in ms at which new letters begin to animate.
+completionSpeed: 9500, // the speed in ms of the text aniamtion.
+jumbleColor: '#0000FF' // the color of the jumbled letters.
+});
+});}
+
+</script>
+</head>
+<body style="background-image:url(image/background.jpg); background-attachment: no-repeat center center fixed">
+<span style="display:none" id="spnSeconds">6</span>
+   <h1 style="text-align:center;color:#000000" id="texthead">Info Bunga-Bunga
+   <h1 style="text-align:center;color:#000000" id="textheadback">di Kabupaten Cianjur</h1></h1><br>
+<figure>
+<img src="image/loading.gif" style="opacity:2;">
+          <figcaption>
+		  <img src="image/iconbunga.png" style="opacity:1;">
+		<br><br><br><br>
+		<!-- /footer -->
+		<p>Info Bunga-Bunga di Kabupaten Cianjur <span class="jqm-version"></span></p>
+		<p>Copyright 2015 Cipa Development </p2>
+		</figcaption>
+</figure>  
+</body>
+</html>
+

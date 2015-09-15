@@ -1,0 +1,434 @@
+<html>
+<head>
+<meta charset="utf-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+     <title>BUNGA</title>
+		<script src="js/jquery-1.10.2.min.js"></script>
+		<script src="js/jquery.mobile-1.4.3.min.js"></script>
+		<script src="js/responsiveslides.min.js"></script>
+		<script charset="utf-8" src="js/apiomat.js"></script>
+		<script src="js/slider.js"></script>		
+		<script src="js/jquery.cycle.all.js"></script>
+		<script src="js/jquery.easing.1.3.js"></script>		
+		<script src="js/jquery.blockUI.js"></script>		
+		<script src="js/textEffect.jquery.js"></script>
+		<script src="js/jquery.panzoom.js"></script>
+		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?v=3&sensor=true"></script>
+        <script type="text/javascript" src="js/gmaps.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="css/jquery.mobile-1.4.3.min.css"> 
+		<link media="screen" rel="stylesheet" type="text/css" href="css/style.css">
+		<link rel="stylesheet" href="css/cipa1.min.css"/> 	
+		<link rel="stylesheet" href="css/jqm-demos.css">
+		<link rel="stylesheet" href="css/demo.css">
+		
+<script type='text/javascript'> 
+	// Tombol Back
+	function onLoad() {
+        document.addEventListener("deviceready", onDeviceReady, false);
+    }
+    function onDeviceReady() {
+    document.addEventListener("backbutton", onBackKeyDown, false);
+	}
+
+	function onBackKeyDown(e) {
+    e.preventDefault();
+    window.location = "home.html";
+	}
+	
+	<!--Code fungsi Mohon Tunggu-->
+	function wait() {
+	$(document).ready(function() { 
+        $.blockUI({ css: { 
+            border: 'none', 
+            padding: '15px', 
+            backgroundColor: '#000', 
+            '-webkit-border-radius': '10px', 
+            '-moz-border-radius': '10px', 
+            opacity: .5, 
+            color: '#fff' 
+        } }); 
+         setTimeout($.unblockUI, 2000); 
+    });   
+	}
+    
+	<!--Code fungsi relasi dan query database halaman sebelumnya-->
+	 	$(function(){
+			 function getUrlVars()
+                        {
+                            // vars should be object not ordinary array
+                            var vars = {}, hash;
+                            var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+                            for(var i = 0; i < hashes.length; i++)
+                            {
+                                hash = hashes[i].split('='); 
+                                vars[hash[0]] = hash[1];
+                            }
+                            return vars;
+                        }
+                        $(window).load(function(e){		                     
+    e.preventDefault();
+    console.log(getUrlVars());
+        var testa = getUrlVars()["id"];
+        var my = document.getElementById('name').innerHTML= testa;  
+		});
+	});
+
+	function showAlert() {
+        navigator.notification.alert("Coba Lagi Nanti..",onDeviceReady,"Perangkat tidak terkoneksi internet","OK");
+		}
+</script>
+<style type='text/css'>
+	#map {
+    display: block;
+    width: 100% !important;
+    height: 400px !important;
+    margin: 0 auto;
+    -moz-box-shadow: 0 5px 20px #ccc;
+    -webkit-box-shadow: 0 5px 20px #ccc;
+    box-shadow: 0 5px 20px #ccc;
+    border-bottom: 1px solid #CCC;
+    border-top: 1px solid #CCC;
+}
+</style> 
+</head>
+<body onload="onLoad();wait();signup();">
+<p id="name" style="display:none"></p>	
+<p id="alpmap" style="display:none"></p>	
+
+<!-- Spesifik Bunga-->
+<div  data-role="page" id="pobus" data-theme="b"  class="jqm-demos jqm-home">
+	<div data-role="header" class="jqm-header">
+	 <a href="home.html" data-icon="back" data-ajax="false" data-iconpos="notext"></a>
+	 <a href="#" onClick="window.location.reload()" data-icon="refresh" data-ajax="false" data-iconpos="notext"></a>
+	<div>
+	<h2 style="white-space: normal;" aria-level="1" role="heading" class="ui-title"><img src="" id="icon" ></h2>
+	<h2 id="h2" style="white-space: normal;font-weight:bold;color:yellow;font-size:20px;" aria-level="1" role="heading" class="ui-title"></h2>
+	</div>
+	</div>
+	<div role="main" data-theme="b"  class="ui-content jqm-content" align="center" style="background-image:url('image/'); background-attachment: fixed; background-repeat: repeat;"  >
+	
+	<!--Slider-->
+		<div class="slide" id="slidepo"></div>
+	
+	<!-- ListView Jenis Bunga-->
+	<ul id="autocomplete" data-role="listview" data-filter="true" data-filter-placeholder="Cari Bunga">
+	<marquee direction="left" scrollamount="4" bgcolor="#8cc63f"><img src="image/butterfly.png"> </img> <i style="text-align:center;color:#FFA500;font-style:italic;font-size:10px;" id="upt2"> No Data</i></marquee></ul></br>
+	<div class="ui-body-d ui-content"><img src="image/loading2.gif" width="60px" height="60px" id="loading_gmb"></div>
+
+	<!-- /footer -->
+	<div data-theme="a" data-role="footer" data-position="fixed" data-tap-toggle="false" class="jqm-footer">
+		<p>Info Bunga-Bunga di Kabupaten Cianjur <span class="jqm-version"></span></p>
+		<p>Copyright 2015 Cipa Development </p2>
+	</div>
+	</div>
+</div>
+
+<!--////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////-->
+
+<!--Bagian Detail Bunga-->
+<div  data-role="page" id="detail" data-theme="c"  class="jqm-demos jqm-home">															
+	<div data-role="header" class="jqm-header">
+	<a href="" id="result2" data-icon="back" data-ajax="false" data-iconpos="notext"></a>
+	<a href="home.html" data-icon="home" data-ajax="false" data-iconpos="notext"></a>
+	<div>
+	<h2 style="white-space: normal;" aria-level="1" role="heading" class="ui-title"><img src="" id="icon2"></h2>
+	<h2 id="h22" style="white-space: normal;font-weight:bold;color:yellow" aria-level="1" role="heading" class="ui-title"></h2>
+	</div>
+	</div>
+	<div role="main" data-theme="b"  class="ui-content jqm-content" style="background-image:url('image/); background-attachment: fixed; background-repeat: repeat;"  >
+
+<!--Slider-->
+	<div class="callbacks_container">
+        <ul class="rslides" id="slider" style="align=center">
+        <li>
+          <img src="image/noimage.png" id="tamp1d" onClick="window.location.reload()">
+		    <p style="text-align:center;" class="caption" id="cap1d"></p>
+        </li>
+        <li>
+          <img src="image/noimage.png" id="tamp2d" onClick="window.location.reload()">
+		    <p style="text-align:center;" class="caption" id="cap2d"></p>
+        </li>
+        <li>
+          <img src="image/noimage.png" id="tamp3d" onClick="window.location.reload()">
+		    <p style="text-align:center;" class="caption" id="cap3d"></p>
+        </li>
+      </ul>
+    </div>
+
+	<!-- Bagian Body -->
+<div style="text-align:left; color: #FF9900; font-family:arial;">
+<h4 id="jk" style="font-size:20px";></h4><h4 id="bgn" style="font-size:20px";></h4>
+</div>
+
+<!-- Bagian NavBar-->
+<div data-role="tabs" id="tabs">
+  <div data-role="navbar">
+    <ul>
+      <li><a href="#informasi" data-ajax="false" class ="ui-btn  ui-mini ui-corner-all ui-btn-icon-left ui-icon-bars">Informasi</a></li>
+      <li><a href="#lokasi" data-ajax="false" onClick="loadPages()" class ="ui-btn  ui-mini ui-corner-all ui-btn-icon-left ui-icon-location">Lokasi</a></li>
+      <li><a href="#tips" data-ajax="false" class ="ui-btn  ui-mini ui-corner-all ui-btn-icon-left ui-icon-info">Tips</a></li>
+    </ul>
+  </div>
+   
+  	<!--NavBar Informasi-->
+	<div id="informasi" class="ui-body-d ui-content" style="font-weight: bold";>
+	<i style="text-align:left;color:yellow;">Asal Negara </i>	 	: <p id="asn"> </p>
+	<i style="text-align:left;color:yellow;">Nama Indonesia </i>	: <p id="nmi"> </p>
+	<i style="text-align:left;color:yellow;">Karakteristik </i> 	: <p id="kr"> </p>
+	<i style="text-align:left;color:yellow;">Usia Hidup </i>		: <p id="usia" style="text-align:left;"> </p> 
+	<i style="text-align:left;color:yellow;">Periode Tumbuh </i>	: <p id="prt" style="text-align:left;"> </p> 
+	<i style="text-align:left;color:yellow;">Info Lainnya</i>		: <p id="info"> </p></i>	
+	<i style="text-align:left;color:yellow;">Lokasi Taman </i>		: <p id="lks" > </p>
+	<marquee direction="left" scrollamount="4"bgcolor="#2E3192"><img src="image/butterfly.png"> </img> <i style="text-align:center;color:#FFA500;font-style:italic;font-size:10px;" id="upt"> No Data</i></marquee>
+	</div>
+	
+	<!--NavBar Lokasi-->
+	<div id="lokasi" >	
+		<div id="map" style="color:#FF9900"></div>	
+        <p id="latitude"  style="display:none"></p><p id="longitude" style="display:none"></p>     
+	</div>
+
+	<!--NavBar TIPS-->
+	<div data-position="fixed" id="tips">
+	<i style="text-align:left;color:yellow;"><b>TIPS : </b></i>	 
+	</div>
+</div>	
+	
+	<!-- /footer -->
+		<div data-theme="a" data-role="footer" data-position="fixed" data-tap-toggle="false" class="jqm-footer">
+		<p>Info Bunga-Bunga di Kabupaten Cianjur <span class="jqm-version"></span></p>
+		<p>Copyright 2015 Cipa Development </p2>
+		</div>
+	</div>
+ </div>
+ 
+<!-- BAGIAN DATABASE
+Catatan:
+1. Untuk nama table, huruf awal harus Besar
+2. Untuk pemanggilan field lebih dari satu, beri imbuhan "s"
+3. Perhatikan penulisan table dan field secara teliti -->    
+
+<script>
+   <!--Pembuatan fungsi sinkronisasi ke data awan-->
+   
+  function signup()
+  {
+    var user = new Apiomat.User();
+    user.setUserName("_username_");
+    user.setPassword("_password_");
+    Apiomat.Datastore.configure(user);
+	 
+    var saveCB = {
+      onOk: function() {
+        statusField.innerHTML = "Saved user successfully";
+      },
+      onError: function(error) {
+	    showAlert();
+        statusField.innerHTML = "Some error occured. "+ error.statusCode + " --> " + error.message;
+		}
+    };
+    user.loadMe({
+      onOk: function() {
+		loadPages();
+        loadPages2();
+		loadPages3();
+      },
+      onError: function(error) {
+      
+        user.save(saveCB);
+      }
+    });
+  }
+
+	<!--Query Data Bunga -->
+        function loadPages()
+  {
+   var x = document.getElementById("name").innerHTML;
+    var y = "kd_bunga=="+'"'+x+'"';   
+  Apiomat.Bunga.getBungas( y, 
+     {
+     onOk:function(bases) 
+     { for (var i=0; i < bases.length;i++) 
+     { addToTable(bases[i]);}
+  },
+  onError: function(error) {
+	  showAlert();
+      status.innerHTML = "Can't load list: "+ error.statusCode + " --> " + error.message;
+  }
+  });
+  }	
+
+  function addToTable(base)
+  {
+		var icon = document.getElementById("icon");icon.src = base.getIconURL();
+		
+		var h2 = document.getElementById("h2");h2.innerHTML = base.getNm_bunga();
+		jQuery(document).ready(function($) {
+		$('#h2').textEffect({
+		effect: 'fade', // the type of the text aniamtion. fade, glow, jumble, slide, dropdown and random (default)
+		effectSpeed: 200, 
+		completionSpeed: 10000, 
+		jumbleColor: '#0000FF'});});
+		
+		var icon2 = document.getElementById("icon2");icon2.src = base.getIconURL();
+		
+		var h22 = document.getElementById("h22");h22.innerHTML = base.getNm_bunga();
+		jQuery(document).ready(function($) {
+		$('#h2d').textEffect({
+		effect: 'slide', // the type of the text aniamtion. fade, glow, jumble, slide, dropdown and random (default)
+		effectSpeed: 100, 
+		completionSpeed: 10000, 
+		jumbleColor: '#0000FF'});});
+		
+		var upt = document.getElementById("upt");upt.innerHTML = "*Last Update : "+ base.getLastModifiedAt();
+		var bgn = document.getElementById("bgn");bgn.innerHTML = base.getNm_bunga();
+		var alpmap = document.getElementById("alpmap");alpmap.innerHTML = "<br>"+ base.getLokasi();
+		var lks = document.getElementById("lks");lks.innerHTML = base.getLokasi();
+		
+		var lat = document.getElementById("latitude");lat.innerHTML = base.getLatitude();
+		var longitude = document.getElementById("longitude");longitude.innerHTML = base.getLongitude();
+		initialize();
+
+} 
+  
+  <!-- Data Detail -->
+  function loadPages2()
+  {
+   var x = document.getElementById("name").innerHTML;
+   var y = "kd_bunga=="+'"'+x+'"';   
+  Apiomat.Detail.getDetails( y, 
+     {
+     
+     onOk:function(dtbungas) 
+     { for (var i=0; i < dtbungas.length;i++) 
+     { addToTableDtbunga(dtbungas[i]);}
+  },
+  onError: function(error) {
+	showAlert();
+    status.innerHTML = "Can't load list: "+ error.statusCode + " --> " + error.message;
+  }
+  });
+  }	
+  
+ function addToTableDtbunga(dtbunga)
+  {
+ 
+		var slidepo = document.getElementById("slidepo");
+		var img= document.createElement("img");img.src = dtbunga.getGmb1URL();	
+		img.style.background="url('image/noimage.png') center no-repeat ";
+		slidepo.appendChild(img);
+		$('#slidepo').cycle({ 
+		fx:      'uncover', 
+		timeout: 3000,		
+		delay: -4000,
+		easing:  'easeInOutBack'
+		});
+		
+		var upt2 = document.getElementById("upt2");upt2.innerHTML = "*Last Update: "+ dtbunga.getLastModifiedAt();
+		var ldg = document.getElementById("loading_gmb");
+		ldg.style.display='none';  
+		
+		var list2 = document.getElementById("autocomplete");
+		var option2 = document.createElement("li");
+		option2.style.textAlign = 'center'; 
+		option2.className = "ui-first-child ui-last-child ui-li-has-thumb "; 
+		list2.appendChild(option2);      
+		var result = document.createElement("a");
+		result.className = "ui-btn ui-btn-icon-right ui-icon-carat-r";
+		result.style.color = "#fff";
+		result.style.textAlign = 'left'  
+		option2.appendChild(result); 
+		result.innerHTML = dtbunga.getNm_bunga_det() +" - ( "+ dtbunga.getNm_ind()+" )";
+		result.value = dtbunga.getKd_detail();
+		var img = document.createElement("img");img.src = dtbunga.getGmb1URL();
+		img.className = "imgcenter";
+		var p1 = document.createElement("p");
+		p1.innerHTML = "<b> Karakteristik: "+ dtbunga.getKarakter();
+		result.appendChild(img);
+		result.appendChild(p1);
+	  
+		result.onclick = 	function () {
+		window.location.href ="bunga.html#detail?id="+  result.value ;
+		loadPages3();
+	    }
+	  }
+  
+<!--Menampilkan/query data dari Class/table Taman-->
+
+	  function loadPages3()
+	{
+	   var x = document.getElementById("name").innerHTML;
+	   var y = "kd_detail=="+'"'+x+'"';  
+      Apiomat.Detail.getDetails(y, 
+     {
+     
+     onOk:function(bungads) 
+     { for (var i=0; i < bungads.length;i++) 
+     { addToPageBunga2(bungads[i]);}
+  },
+  onError: function(error) {
+	showAlert();
+    status.innerHTML = "Can't load list: "+ error.statusCode + " --> " + error.message;
+  }
+  });
+  }
+
+  <!--Melakukan Query data-->
+  function addToPageBunga2(bungad)
+  {
+		var name = document.getElementById("name");name.innerHTML = bungad.getKd_bunga();
+		loadPages();
+	   
+	   	var tamp1d = document.getElementById("tamp1d");tamp1d.src = bungad.getGmb1URL();
+		var tamp2d = document.getElementById("tamp2d");tamp2d.src = bungad.getGmb2URL();
+		var tamp3d = document.getElementById("tamp3d");tamp3d.src = bungad.getGmb3URL();
+	   
+	   	   
+		var cap1d = document.getElementById("cap1d");cap1d.innerHTML = bungad.getNm_bunga_det();
+		var cap2d = document.getElementById("cap2d");cap2d.innerHTML = bungad.getNm_bunga_det();
+		var cap3d = document.getElementById("cap3d");cap3d.innerHTML = bungad.getNm_bunga_det();
+
+		var jk = document.getElementById("jk");jk.innerHTML = "JENIS : " + bungad.getNm_bunga_det();
+		var asn = document.getElementById("asn");asn.innerHTML = bungad.getAsal_negara();
+		var nmi = document.getElementById("nmi");nmi.innerHTML = bungad.getNm_ind();
+		var kr = document.getElementById("kr");kr.innerHTML = bungad.getKarakter();	
+		var usia = document.getElementById("usia");usia.innerHTML = bungad.getUsia_hidup();		
+		var prt = document.getElementById("prt");prt.innerHTML = bungad.getPeriode_tmbh();
+		var info = document.getElementById("info");info.innerHTML = bungad.getInfo();		
+		var tips = document.getElementById("tips");tips.innerHTML = bungad.getTips();
+		var result = document.getElementById("result");
+		result2.value = bungad.getKd_bunga();
+		result2.onclick = function () {
+		window.location.href ="bunga.html?id="+  result2.value ;
+
+       }
+	   }
+	
+	<!-- Bagian Map --!>
+	function initialize() {
+	var map1 = document.getElementById("latitude").innerHTML;
+	var map2 = document.getElementById("longitude").innerHTML;
+	var bgn = document.getElementById("bgn").innerHTML;
+	var almtbgn = document.getElementById("alpmap").innerHTML;
+	
+	var map = new GMaps({
+	div: '#map',
+	lat: map1,
+	lng: map2,	
+	});
+	
+	map.addMarker({
+	lat: map1,
+	lng: map2,
+	title: bgn,
+	icon: 'image/map-marker.png',
+	infoWindow: {
+	content: bgn + almtbgn
+	}
+	});
+	}    
+ 
+ </script>
+</body>
+</html>
